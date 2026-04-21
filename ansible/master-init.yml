@@ -1,0 +1,40 @@
+---
+- name: Initialize k8s master nodes
+  hosts: master-kube
+  become: yes
+
+  tasks:
+    - name: initialize k8s cluster
+      command: kubeadm init --pod-network-cidr=10.244.0.0/16 --ignore-preflight-errors=all
+      register: kubeadm_output
+      args:
+        creates: /etc/kubernetes/admin.conf
+
+    - name: create .kube directory
+      file:
+        path: /home/ubuntu/.kube
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+
+    - name: copy admin.cong to user's kube confg
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/ubuntu/.kube/config
+        remote_src: yes
+        owner: ubuntu
+        mode: 0644
+
+    - name: Save worker join command to a file
+      copy:
+        content: "{{ kubeadm_output.stdout_lines | select('search','kubeadm join') | list | join(' ') }}"
+        dest: /home/ubuntu/kube_join_cmd.sh
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Install Flannel network plugin
+      become_user: ubuntu
+      command: kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+      environment:
+        KUBECONFIG: /home/ubuntu/.kube/config

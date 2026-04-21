@@ -1,0 +1,12 @@
+- hosts: master-kube
+  become: yes
+  tasks:
+    - name: Deploy application
+      command: kubectl apply -f /home/ubuntu/deployment.yml
+      environment:
+        KUBECONFIG: /home/ubuntu/.kube/config
+
+    - name: Expose service
+      command: kubectl apply -f /home/ubuntu/service.yml
+      environment:
+        KUBECONFIG: /home/ubuntu/.kube/config
