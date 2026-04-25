@@ -27,7 +27,7 @@ pipeline {
                 echo "Logging into DockerHub and pushing image..."
 
                 withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
+                    credentialsId: 'docker-cred',
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
