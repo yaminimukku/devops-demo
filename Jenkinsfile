@@ -16,6 +16,12 @@ pipeline {
                 sh 'docker build -t devops-demo:latest .'
             }
         }
-
+        stage('Push Docker Image') {
+           steps {
+                 echo "Pushing image to DockerHub..."
+                 sh 'docker tag devops-demo:latest yourdockerhub/devops-demo:latest'
+                 sh 'docker push yourdockerhub/devops-demo:latest'
+                }
+           }
     }
 }
