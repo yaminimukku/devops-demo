@@ -27,15 +27,14 @@ pipeline {
                 echo "Logging into DockerHub and pushing image..."
 
                 withCredentials([usernamePassword(
-                    credentialsId: 'jenkins-cred',
+                    credentialsId: 'docker-cred',
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
 
                     sh """
                     echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                    docker tag ${IMAGE_NAME}:${TAG} $DOCKER_USER/devops-demo:${TAG}
-                    docker push $DOCKER_USER/devops-demo:${TAG}
+                    docker push $IMAGE_NAME:$TAG
                     """
                 }
             }
